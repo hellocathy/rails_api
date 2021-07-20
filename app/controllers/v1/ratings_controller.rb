@@ -1,6 +1,6 @@
 class V1::RatingsController < ApplicationController
   def index
-    ratings = Rating.select([:id] + permitted_parameters)
+    ratings = Rating.select(select_parameters)
     
     render json: { success: true, ratings: ratings }, status: :ok
   rescue Exception => e
@@ -25,6 +25,10 @@ class V1::RatingsController < ApplicationController
   end
 
   protected
+
+  def select_parameters
+    [:id, :rate]
+  end
 
   def permitted_parameters
     [:rate]

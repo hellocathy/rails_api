@@ -1,6 +1,6 @@
 class V1::QuestionsController < ApplicationController
   def index
-    questions = Question.select([:id] + permitted_parameters)
+    questions = Question.select(select_parameters)
 
     render json: { success: true, questions: questions }, status: :ok
   rescue Exception => e
@@ -40,6 +40,10 @@ class V1::QuestionsController < ApplicationController
   end
 
   protected
+
+  def select_parameters
+    [:id, :text, :question_type, :placeholder, :required]
+  end
 
   def permitted_parameters
     [:text, :question_type, :placeholder, :required]
