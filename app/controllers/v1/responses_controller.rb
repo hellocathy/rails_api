@@ -10,7 +10,7 @@ class V1::ResponsesController < ApplicationController
   def create
     return render json: { success: false }, status: :bad_request unless complete_params?
     
-    return render json: { success: false }, status: :not_found unless questions_found?
+    return render json: { success: false }, status: :not_found if no_questions_found?
 
     result = responses.map.each do |question_id, answer|
       create_response(question_id, answer)
@@ -38,7 +38,9 @@ class V1::ResponsesController < ApplicationController
   private
 
   def create_response(question_id, answer)
-    question = Question.find(question_id)
+    question = Question.find_by(id: question_id)
+
+    return unless question.present? && answer.present?
 
     response = Response.create(
       rating_id: rating_id,
@@ -48,10 +50,10 @@ class V1::ResponsesController < ApplicationController
     { question: question.text, answer: response.answer } if response.valid?
   end
 
-  def questions_found?
+  def no_questions_found?
     questions = Question.where(id: responses.keys)
 
-    questions.count == responses.count
+    questions.count == 0
   end
 
   def complete_params?
