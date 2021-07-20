@@ -2,8 +2,7 @@ class ApplicationController < ActionController::API
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::RequestForgeryProtection
 
-  # protect_from_forgery with: :null_session
-  # respond_to :json
+  protect_from_forgery with: :null_session
   before_action :authenticate
 
   protected
@@ -13,9 +12,9 @@ class ApplicationController < ActionController::API
   end
 
   def authenticate_token
-    authenticate_with_http_token do |token, options|
-      # @user = User.find_by(token: token)
-      true
+    authenticate_with_http_token do |_token, options|
+      token = Base64.strict_encode64(_token)
+      @user = ApiUser.find_by(token: token)
     end
   end
 
