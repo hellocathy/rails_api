@@ -1,18 +1,18 @@
 class V1::RatingsController < ApplicationController
-  def create
-    rating = Rating.create(payload)
-    render json: { success: true, id: rating.id, rate: rating.rate }, status: :created
+  def index
+    ratings = Rating.select([:id] + permitted_parameters)
+    
+    render json: { success: true, ratings: ratings }, status: :ok
   rescue Exception => e
-    render json: e.message, status: :unprocessable_entity
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
   end
 
-  def index
-    ratings = []
-    Rating.find_each do |rating|
-      ratings << rating.slice("id", "rate")
-    end
+  def create
+    rating = Rating.create(payload)
 
-    render json: ratings, status: :ok
+    render json: { success: true, id: rating.id }, status: :created
+  rescue Exception => e
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
   end
 
   def report
@@ -20,6 +20,14 @@ class V1::RatingsController < ApplicationController
     ratings = ratings.merge(Rating.order(rate: :asc).group(:rate).count)
 
     render json: { rating_breakdown: ratings }, status: :ok
+  rescue Exception => e
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
+  end
+
+  protected
+
+  def permitted_parameters
+    [:rate]
   end
 
   private
@@ -33,6 +41,6 @@ class V1::RatingsController < ApplicationController
   end
 
   def payload
-    @payload ||= params.permit(:rate).as_json
+    @payload ||= params.permit(permitted_parameters).as_json
   end
 end

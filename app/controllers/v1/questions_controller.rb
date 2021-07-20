@@ -1,46 +1,53 @@
 class V1::QuestionsController < ApplicationController
   def index
-    questions = []
-    Question.find_each do |question|
-      questions << question.slice("id", "text", "question_type", "placeholder", "required")
-    end
+    questions = Question.select([:id] + permitted_parameters)
 
-    render json: questions, status: :ok
+    render json: { success: true, questions: questions }, status: :ok
+  rescue Exception => e
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
   end
 
   def create
     question = Question.create(payload)
 
-    render json: { success: true, question_id: question.id }, status: :created
+    render json: { success: true }, status: :created
   rescue Exception => e
-    render json: e.message, status: :unprocessable_entity
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
   end
 
   def update
     question = Question.find_by(id: params["id"])
-    question.update(payload)
 
-    head :ok
+    return head :not_found if question.blank?
+
+    return head :bad_request if payload.blank?
+
+    render json: { success: question.update(payload) }, status: :ok
   rescue Exception => e
-    head :unprocessable_entity
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
   end
 
   def destroy
     question = Question.find_by(id: params["id"])
 
-    if question.present?
-      question.destroy
-      head :ok
-    else
-      head :not_found
-    end
+    return head :not_found unless question.present?
+
+    question.destroy
+
+    head :ok
   rescue Exception => e
-    head :unprocessable_entity
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
+  end
+
+  protected
+
+  def permitted_parameters
+    [:text, :question_type, :placeholder, :required]
   end
 
   private
 
   def payload
-    @payload ||= params.permit(:text, :question_type, :placeholder, :required).as_json
+    @payload ||= params.permit(permitted_parameters).as_json
   end
 end

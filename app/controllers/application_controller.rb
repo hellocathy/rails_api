@@ -23,4 +23,8 @@ class ApplicationController < ActionController::API
     self.headers['WWW-Authenticate'] = 'Token realm="Application"'
     render json: { error: 'Bad credentials' }, status: 401
   end
+
+  def permitted_parameters
+    raise NotImplementedError
+  end
 end
