@@ -37,9 +37,7 @@ class V1::QuestionsController < ApplicationController
 
     return head :not_found unless question.present?
 
-    question.destroy
-
-    head :ok
+    head question.destroy ? :ok : :unprocessable_entity
   rescue Exception => e
     render json: { success: false, error: e.message },
            status: :unprocessable_entity
