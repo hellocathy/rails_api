@@ -23,6 +23,10 @@ class ApplicationController < ActionController::API
     render json: { error: 'Bad credentials' }, status: 401
   end
 
+  def select_parameters
+    raise NotImplementedError
+  end
+
   def permitted_parameters
     raise NotImplementedError
   end
