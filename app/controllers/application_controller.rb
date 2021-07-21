@@ -2,8 +2,8 @@ class ApplicationController < ActionController::API
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::RequestForgeryProtection
 
-  protect_from_forgery with: :null_session
-  before_action :authenticate
+  protect_from_forgery with: :null_session, unless: -> { Rails.env.test? }
+  before_action :authenticate, unless: -> { Rails.env.test? }
 
   protected
 

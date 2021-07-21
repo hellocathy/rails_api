@@ -1,7 +1,5 @@
 class Question < ActiveRecord::Base
   has_many :responses
 
-  validates :question_type, presence: true
-
-  # enumerize :type, in: { short_answer: 0, email: 1, linear_scale: 2 }
+  validates :question_type, inclusion: { in: %w(short_answer email linear_scale) }
 end

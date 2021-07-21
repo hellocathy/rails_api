@@ -10,13 +10,12 @@ gem 'mysql2'
 
 gem 'puma', '~> 5.0'
 
-gem 'rspec'
-
 gem 'bootsnap', '>= 1.4.4', require: false
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rack-cors'
+  gem 'rspec-rails'
 end
 
 group :development do

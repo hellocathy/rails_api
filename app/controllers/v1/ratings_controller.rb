@@ -4,13 +4,15 @@ class V1::RatingsController < ApplicationController
     
     render json: { success: true, ratings: ratings }, status: :ok
   rescue Exception => e
-    render json: { success: false, error: e.message }, status: :unprocessable_entity
+    render json: { success: false, error: e.message },
+           status: :unprocessable_entity
   end
 
   def create
     rating = Rating.create(payload)
 
-    render json: { success: true, id: rating.id }, status: :created
+    render json: { success: rating.id?, id: rating.id },
+           status: rating.id? ? :created : :unprocessable_entity
   rescue Exception => e
     render json: { success: false, error: e.message }, status: :unprocessable_entity
   end

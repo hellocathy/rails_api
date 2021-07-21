@@ -4,15 +4,18 @@ class V1::QuestionsController < ApplicationController
 
     render json: { success: true, questions: questions }, status: :ok
   rescue Exception => e
-    render json: { success: false, error: e.message }, status: :unprocessable_entity
+    render json: { success: false, error: e.message },
+           status: :unprocessable_entity
   end
 
   def create
     question = Question.create(payload)
 
-    render json: { success: true }, status: :created
+    render json: { success: question.id? },
+           status: question.id? ? :created : :unprocessable_entity
   rescue Exception => e
-    render json: { success: false, error: e.message }, status: :unprocessable_entity
+    render json: { success: false, error: e.message },
+           status: :unprocessable_entity
   end
 
   def update
@@ -22,9 +25,11 @@ class V1::QuestionsController < ApplicationController
 
     return head :bad_request if payload.blank?
 
-    render json: { success: question.update(payload) }, status: :ok
+    render json: { success: question.update(payload) },
+           status: question.valid? ? :ok : :unprocessable_entity
   rescue Exception => e
-    render json: { success: false, error: e.message }, status: :unprocessable_entity
+    render json: { success: false, error: e.message },
+           status: :unprocessable_entity
   end
 
   def destroy
@@ -36,7 +41,8 @@ class V1::QuestionsController < ApplicationController
 
     head :ok
   rescue Exception => e
-    render json: { success: false, error: e.message }, status: :unprocessable_entity
+    render json: { success: false, error: e.message },
+           status: :unprocessable_entity
   end
 
   protected
